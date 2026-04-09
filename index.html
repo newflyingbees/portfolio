@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | 4-Column Masonry</title>
+    <style>
+        :root {
+            --bg-color: #CCC7C7;
+            --text-primary: #0e0e0e;
+            --text-secondary: #4a4a4a;
+            --border-normal: #9400D3;
+            --border-hover: #00ffff; /* Fluorescent Blue */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Navigation */
+        nav {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            padding: 40px 15% 0;
+            box-sizing: border-box;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Hero Header */
+        header {
+            width: 70%;
+            padding: 100px 0 60px; 
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        header h1 { 
+            font-size: 2.8rem; 
+            margin: 0 auto 20px;
+            font-weight: 400;
+            line-height: 1.2;
+            max-width: 800px;
+        }
+
+        header p { 
+           color: var(--text-secondary); 
+            font-size: 1.2rem; 
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        /* Tiles Container */
+        .masonry-grid {
+            width: 70%;
+            column-count: 4;
+            column-gap: 20px;
+            padding-bottom: 100px;
+        }
+
+        @media (max-width: 1200px) { .masonry-grid { column-count: 3; width: 85%; } header { width: 85%; } }
+        @media (max-width: 900px) { .masonry-grid { column-count: 2; } }
+        @media (max-width: 600px) { .masonry-grid { column-count: 1; } }
+
+        /* Tile Styling */
+        .tile {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid var(--border-normal);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-sizing: border-box;
+        }
+
+        .tile:hover {
+            border-color: var(--border-hover);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15);
+        }
+
+        .h-1 { min-height: 200px; }
+        .h-2 { min-height: 300px; }
+        .h-3 { min-height: 400px; }
+        .h-4 { min-height: 250px; }
+
+        .tile span { 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            color: var(--text-secondary);
+        }
+
+        .tile h3 { 
+            margin: 10px 0 0; 
+            font-size: 1.2rem; 
+            font-weight: 500; 
+        }
+
+        .tile img {
+            width: 100%;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            filter: grayscale(100%);
+            transition: filter 0.4s ease;
+        }
+
+        .tile:hover img {
+            filter: grayscale(0%);
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg-color);
+            z-index: 1000;
+            overflow-y: auto; /* Allow scrolling if external content is long */
+        }
+
+        .modal-content {
+            margin: 5% auto;
+            width: 70%;
+            max-width: 900px;
+            background: white; /* Added white background for readability of loaded pages */
+            padding: 40px;
+            min-height: 80vh;
+        }
+
+        .close-btn {
+            position: fixed; /* Keep close button visible */
+            top: 40px; right: 5%;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="https://newflyingbees.github.io/bees">Home</a>
+        <a href="https://goingextramilenew.blogspot.com/">Blog</a>
+        <a href="https://goingextramilenew.blogspot.com/2025/06/blog-post.html">About</a>
+        <a href="#">Contact</a>
+    </nav>
+
+    <header>
+        <h1>A digital playground for modern aesthetics.</h1>
+        <p>Exploring the intersection of code and visual balance.</p>
+    </header>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <div class="masonry-grid" id="tileContainer"></div>
+
+    <div id="projectModal" class="modal">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="modal-content" id="modalContentArea">
+            <h2 id="modalTitle"></h2>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+    // 1. DATA SECTION: Updated Project 01 with 'externalFile'
+    const myProjects = [
+        { 
+            title: "Project 01", 
+            category: "Development", 
+            content: "Loading project...", // Fallback text
+            externalFile: "Start with the Fruit.html",    // NEW: The file you uploaded to GitHub
+            size: "h-3",
+            image: "https://wowslider.com/sliders/demo-87/data1/images/landscape404072_1280.jpg"
+        },
+        { title: "Day 995: New Bees", category: "New Build", content: "Standard modal text here.", size: "h-2", image:"https://wowslider.com/sliders/demo-31/data1/images/bench560435.jpg" },
+        { title: "Project 04", category: "Design", content: "Details for project 4...", externalFile: "test1.html", size: "h-1", image:"https://wowslider.com/sliders/demo-70/data1/images/islands.jpg" },
+        { title: "Project 05", category: "Concept", content: "Details for project 5...", size: "h-4", image: "https://wowslider.com/sliders/demo-80/data1/images/sheet546475_1920.jpg" },
+        { title: "Project 06", category: "Archive", content: "Details for project 6...", size: "h-2", image:"https://wowslider.com/sliders/demo-24/data1/images/alligator.jpg" },
+        { title: "Day 05: New Concept", category: "Daily Build", content: "Fresh concept build.", size: "h-2", image:"https://wowslider.com/sliders/demo-78/data1/images/oldletters436501_1280.jpg" },
+        { title: "Project 02", category: "Development", content: "Details for project 2...", size: "h-3", image:"https://wowslider.com/sliders/demo-83/data1/images/innsbruck358280_1280.jpg" }
+    ];
+
+    const container = document.getElementById('tileContainer');
+
+    function renderTiles() {
+        container.innerHTML = ""; 
+        myProjects.forEach((project, index) => {
+            const tile = document.createElement('div');
+            tile.className = `tile ${project.size}`;
+            
+            // Pass the whole project object to the open function
+            tile.onclick = () => openModal(project);
+            
+            tile.innerHTML = `
+                <img src="${project.image}" alt="${project.title}">
+                <span>${project.category}</span>
+                <h3>${project.title}</h3>
+            `;
+            container.appendChild(tile);
+        });
+    }
+
+    // Updated Modal Logic to handle external HTML
+    function openModal(project) {
+        const titleEl = document.getElementById('modalTitle');
+        const bodyEl = document.getElementById('modalBody');
+        
+        titleEl.innerText = project.title;
+        bodyEl.innerHTML = project.content; // Show default/loading text first
+
+        // If there is an external file, fetch it
+        if (project.externalFile) {
+            fetch(project.externalFile)
+                .then(response => {
+                    if (!response.ok) throw new Error('File not found');
+                    return response.text();
+                })
+                .then(htmlContent => {
+                    bodyEl.innerHTML = htmlContent;
+                })
+                .catch(err => {
+                    bodyEl.innerHTML = "<p style='color:red;'>Failed to load content. Please ensure " + project.externalFile + " is uploaded to your GitHub repo.</p>";
+                });
+        }
+
+        document.getElementById('projectModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        document.getElementById('projectModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        // Clear content so it doesn't show old project next time you click
+        document.getElementById('modalBody').innerHTML = "";
+    }
+
+    renderTiles();
+</script>
+</body>
+</html>
